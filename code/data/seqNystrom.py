@@ -10,8 +10,8 @@ def randomized_nystrom(A, omega, k):
 		Z = solve_triangular(L, C.T, lower=True).T
 	except:
 		B_U, B_S, B_Vt = svd(B, full_matrices=False)
-		pseudo_SqrtS = np.array([1./B_S[i]**0.5 if B_S[i] != 0 else 0 for i in range(B_S.size)])
-		Z = C @ B_U @ np.diag(pseudo_SqrtS) @ B_U.T
+		pseudo_sqrtS = np.array([1./b_s**0.5 if b_s != 0 else 0 for b_s in B_S])
+		Z = C @ B_U @ np.diag(pseudo_sqrtS) @ B_U.T
 	
 	Q, R = qr(Z, mode='economic')
 
