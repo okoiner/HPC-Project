@@ -8,7 +8,7 @@ def randomized_nystrom(A, omega, k):
 	try:
 		L = cholesky(B, lower=True)
 		Z = solve_triangular(L, C.T, lower=True).T
-	except:
+	except np.linalg.LinAlgError:
 		B_U, B_S, B_Vt = svd(B, full_matrices=False)
 		pseudo_sqrtS = np.array([1./b_s**0.5 if b_s != 0 else 0 for b_s in B_S])
 		Z = C @ B_U @ np.diag(pseudo_sqrtS) @ B_U.T
@@ -24,7 +24,7 @@ def randomized_nystrom(A, omega, k):
 	return Uhat_k @ np.diag(S_k**2) @ Uhat_k.T
 
 if __name__ == "__main__":
-	n = 2**9
+	n = 2**4
 	l = 600
 	k = 400
 
