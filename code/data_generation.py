@@ -8,17 +8,17 @@ def A_ExpDecay(n, R, p):
 
 def A_MNIST(n, sigma = 100):
 	try:
-		return np.load("A_MNIST_" + str(n) + "_" + str(sigma) + ".npy")
+		return np.load("data/A_MNIST_" + str(n) + "_" + str(sigma) + ".npy")
 	except:
 		print("The matrix has to be generated, this can take time")
 		
-		X = np.load("dataMNIST.npy")
+		X = np.load("data/dataMNISTnorm.npy")
 		m = X.shape[1]
 		
 		sigma2 = sigma**2
 		A = np.fromfunction(lambda i, j: np.exp(- sum(((X[i, d] - X[j, d])**2) for d in range(m))/sigma2), (n, n), dtype=int)
 		
-		np.save("A_MNIST_" + str(n) + "_" + str(sigma) + ".npy", A)
+		np.save("data/A_MNIST_" + str(n) + "_" + str(sigma) + ".npy", A)
 		
 		print("Generation complete")
 		
@@ -26,17 +26,17 @@ def A_MNIST(n, sigma = 100):
 
 def A_YearPredictionMSD(n, sigma):
 	try:
-		return np.load("A_YearPredictionMSD_" + str(n) + "_" + str(sigma) + ".npy")
+		return np.load("data/A_YearPredictionMSD_" + str(n) + "_" + str(sigma) + ".npy")
 	except:
 		print("The matrix has to be generated, this can take time")
 		
-		X = np.load("dataYearPredictionMSDreduced.npy")
+		X = np.load("data/dataYearPredictionMSDreduced.npy")
 		m = X.shape[1]
 		
 		sigma2 = sigma**2
 		A = np.fromfunction(lambda i, j: np.exp(- sum(((X[i, d] - X[j, d])**2) for d in range(m))/sigma2), (n, n), dtype=int)
 		
-		np.save("A_YearPredictionMSD_" + str(n) + "_" + str(sigma) + ".npy", A)
+		np.save("data/A_YearPredictionMSD_" + str(n) + "_" + str(sigma) + ".npy", A)
 		
 		print("Generation complete")
 		

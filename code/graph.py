@@ -5,7 +5,7 @@ from sketching import *
 import matplotlib.pyplot as plt
 
 n = 2**10
-A = A_YearPredictionMSD(n, 10**5)
+A = A_MNIST(n, 100)
 Anuc = np.linalg.norm(A, ord='nuc')
 
 ll = np.array([400 + 100*i for i in range(5)])
