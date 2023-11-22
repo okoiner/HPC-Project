@@ -9,7 +9,7 @@ def A_ExpDecay(n, R, p):
 def A_MNIST(n, sigma = 100):
 	try:
 		return np.load("data/A_MNIST_" + str(n) + "_" + str(sigma) + ".npy")
-	except:
+	except FileNotFoundError:
 		print("The matrix has to be generated, this can take time")
 		
 		X = np.load("data/dataMNISTnorm.npy")
@@ -27,7 +27,7 @@ def A_MNIST(n, sigma = 100):
 def A_YearPredictionMSD(n, sigma):
 	try:
 		return np.load("data/A_YearPredictionMSD_" + str(n) + "_" + str(sigma) + ".npy")
-	except:
+	except FileNotFoundError:
 		print("The matrix has to be generated, this can take time")
 		
 		X = np.load("data/dataYearPredictionMSDreduced.npy")

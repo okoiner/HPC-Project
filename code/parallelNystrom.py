@@ -25,10 +25,11 @@ k = 150
 
 assert n > 0 and math.log2(n).is_integer() and int(math.log2(n))%2 == 0, "n must be a power of 4"
 assert n//s >= l, "l is too big, TSQR will fail, change it to " + str(n//s) + " or less"
+assert l >= k, "l must be greater or equal than k"
 
 A = None
 if rank == 0:
-	A = A_YearPredictionMSD(n, 10**6)
+	A = A_YearPredictionMSD(n, 10**5)
 	wt = MPI.Wtime()
 
 #========block distribution of A========
@@ -64,45 +65,48 @@ local_rng = np.random.default_rng(local_random_seed)
 
 randCol = general_rng.choice(n, l, replace=False)
 signs = col_rng.choice([-1, 1], size=rc_local)
-omega_local = np.fromfunction(np.vectorize(lambda i, j: signs[i]*(-1)**(bin(i & randCol[j]).count("1"))), (rc_local, l), dtype=int) / math.sqrt(l)
+omega_local = np.fromfunction(np.vectorize(lambda i, j: signs[i]*(-1)**(bin((i + col*rc_local) & randCol[j]).count("1"))), (rc_local, l), dtype=int) / math.sqrt(l)
 
 #========block multiplications========
 C_prod = A_local @ omega_local
 C_reduced = np.empty((rc_local,l))
 comm_row.Reduce(C_prod, C_reduced, op = MPI.SUM, root = row)
+
 C_local = np.empty((s_local,l))
 comm_col.Scatterv(C_reduced, C_local, root = col)
 
 B_local = omega_local[(row*s_local):((row+1)*s_local),:].T @ C_local
 B = np.empty((l,l))
 comm.Reduce(B_local, B, op = MPI.SUM, root=0)
-if rank == 0: print(B)
 
 #========cholesky========
 cholesky_success = True
 if rank == 0:
 	try:
-		L = cholesky(B, lower=True)
-	except np.linalg.LinAlgError :
+		L = strong_transpose(cholesky(B))
+	except np.linalg.LinAlgError:
 		print(":(")
 		cholesky_success = False
 		U_B, S_B, Vt_B = svd(B, full_matrices=False)
-		S_pseudo_sqrt = np.array([1./s_b**0.5 if s_b != 0 else 0 for s_b in S_B])
-		L_pseudo_inv = U_B @ np.diag(S_pseudo_sqrt) @ U_B.T
+		S_pseudo_sqrt = np.array([1./s_b**0.5 if s_b < 1e-4 else 0 for s_b in S_B])
+		L = (U_B * S_pseudo_sqrt) @ U_B.T
+else:
+	L = np.empty((l,l))
+comm.Bcast(L, root=0)
 
 cholesky_success = comm.bcast(cholesky_success, root=0)
 if cholesky_success:
-	if rank != 0: L = np.empty((l,l))
-	comm.Bcast(L, root=0)
 	Z_local = solve_triangular(L, C_local.T, lower=True).T
 else:
-	if rank != 0: L_pseudo_inv = np.empty((l,l))
-	comm.Bcast(L_pseudo_inv, root=0)
-	Z_local = C_local @ L_pseudo_inv
+	Z_local = C_local @ L
 
 #========TSQR========
 toFactor = Z_local
 Q_list = []
+
+toFactorrr = np.empty((n,l))
+comm.Gatherv(toFactor, toFactorrr, root = 0)
+if rank == 0: np.save("parallel", toFactorrr)
 
 is_active = True
 TSQR_steps = int(math.log2(s))

@@ -5,10 +5,9 @@ from sketching import *
 
 def randomized_nystrom(A, omega, k):
 	C = A @ omega
-	print(C)
 	B = omega.T @ C
+	
 	try:
-		print(B)
 		L = cholesky(B, lower=True)
 		Z = solve_triangular(L, C.T, lower=True).T
 	except np.linalg.LinAlgError:
@@ -32,11 +31,11 @@ if __name__ == "__main__":
 	l = 200
 	k = 150
 
-	A = A_YearPredictionMSD(n, 10**6)
+	A = A_YearPredictionMSD(n, 10**5)
 	
 	general_random_seed = 42 #np.random.randint(2**30)
 	general_rng = np.random.default_rng(general_random_seed)
-	randCol = np.random.choice(n, l, replace=False)
+	randCol = general_rng.choice(n, l, replace=False)
 	
 	col_random_seed_0 = general_random_seed + 1
 	col_random_seed_1 = general_random_seed + 1 + 1
@@ -46,7 +45,7 @@ if __name__ == "__main__":
 	signs = np.concatenate((col_rng_0.choice([-1, 1], size=n//2), col_rng_1.choice([-1, 1], size=n//2)))
 	
 	omega = np.fromfunction(np.vectorize(lambda i, j: signs[i]*(-1)**(bin(i & randCol[j]).count("1"))), (n, l), dtype=int) / math.sqrt(l)
-
+	
 	A_k = randomized_nystrom(A, omega, k)
 	
 	print(np.linalg.norm(A - A_k, ord='nuc')/np.linalg.norm(A, ord='nuc'))

@@ -1,6 +1,4 @@
-import numpy as np
-import data_generation as dg
-from sketching import *
-import time
+import counter as ct
 
-dg.A_MNIST(2**9, sigma = 100)
+print(ct.get_counter())
+ct.add_counter(1)
