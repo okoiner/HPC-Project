@@ -15,13 +15,33 @@ def stopp(comm, rank):
 	dummy = 0
 	dummy = comm.bcast(dummy, root=0)
 
+def block_SRHT(n, l, col, rc_local, general_random_seed, col_random_seed):
+	general_rng = np.random.default_rng(general_random_seed)
+	col_rng = np.random.default_rng(col_random_seed)
+
+	randCol = general_rng.choice(n, l, replace=False)
+	signs = col_rng.choice([-1, 1], size=rc_local)
+	return np.fromfunction(np.vectorize(lambda i, j: signs[i]*(-1)**(bin((i + col*rc_local) & randCol[j]).count("1"))), (rc_local, l), dtype=int) / math.sqrt(l)
+
+def block_short_axis(n, l, col, rc_local, col_random_seed, kk = 8):
+	col_rng = np.random.default_rng(col_random_seed)
+	
+	sketch = np.zeros((rc_local, l), dtype='d')
+	bounds = np.ceil(np.linspace(0,l,kk+1))
+	for i in range(rc_local):
+		 col = col_rng.integers(bounds[:kk], bounds[1:], size=kk)
+		 sketch[i,col] = col_rng.choice([-1, 1], size=kk)*col_rng.uniform(1., 2., size=kk)
+	return sketch
+
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 s = comm.Get_size()
 
 n = 2**10
-l = 200
-k = 150
+l = 64
+k = 32
+
+use_SRHT = False 	#change to False to use short axis sketching
 
 assert n > 0 and math.log2(n).is_integer() and int(math.log2(n))%2 == 0, "n must be a power of 4"
 assert n//s >= l, "l is too big, TSQR will fail, change it to " + str(n//s) + " or less"
@@ -57,15 +77,12 @@ if rank == 0:
 	general_random_seed = 42 #np.random.randint(2**30)
 general_random_seed = comm.bcast(general_random_seed, root = 0)
 col_random_seed = general_random_seed + col + 1
-local_random_seed = general_random_seed + n_rowcol + rank + 1
+#local_random_seed = general_random_seed + n_rowcol + rank + 1
 
-general_rng = np.random.default_rng(general_random_seed)
-col_rng = np.random.default_rng(col_random_seed)
-local_rng = np.random.default_rng(local_random_seed)
-
-randCol = general_rng.choice(n, l, replace=False)
-signs = col_rng.choice([-1, 1], size=rc_local)
-omega_local = np.fromfunction(np.vectorize(lambda i, j: signs[i]*(-1)**(bin((i + col*rc_local) & randCol[j]).count("1"))), (rc_local, l), dtype=int) / math.sqrt(l)
+if use_SRHT:
+	omega_local = block_SRHT(n, l, col, rc_local, general_random_seed, col_random_seed)
+else:
+	omega_local = block_short_axis(n, l, col, rc_local, col_random_seed)
 
 #========block multiplications========
 C_prod = A_local @ omega_local

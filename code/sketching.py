@@ -40,3 +40,18 @@ def SRHT_sketch(n, l):
 	randCol = np.random.choice(n, l, replace=False)
 	
 	return np.fromfunction(np.vectorize(lambda i, j: signs[i]*(-1)**(bin(i & randCol[j]).count("1"))), (n, l), dtype=int) / math.sqrt(l)
+
+def short_axis_sketch_naive(n, l, k):
+	sketch = np.zeros((n,l), dtype='d')
+	for i in range(n):
+		col = np.random.choice(l, k, replace=False)
+		sketch[i,col] = np.random.choice([-1, 1], size=k)*np.random.uniform(1., 2., size=k)
+	return sketch
+
+def short_axis_sketch(n, l, k):
+	sketch = np.zeros((n,l), dtype='d')
+	bounds = np.ceil(np.linspace(0,l,k+1))
+	for i in range(n):
+		 col = np.random.randint(bounds[:k], bounds[1:], size=k)
+		 sketch[i,col] = np.random.choice([-1, 1], size=k)*np.random.uniform(1., 2., size=k)
+	return sketch

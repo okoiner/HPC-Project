@@ -1,4 +1,9 @@
 import counter as ct
+import numpy as np
 
-print(ct.get_counter())
-ct.add_counter(1)
+l = 1002
+k = 13
+
+bounds = np.ceil(np.linspace(0,l,k+1))
+
+print(np.random.randint(bounds[:k], bounds[1:], size=k))
