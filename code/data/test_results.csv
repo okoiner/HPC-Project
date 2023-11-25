@@ -1,0 +1,3 @@
+date&time,computer,n_processors,parallel/sequencial,log2_n,matrix_type,R,p,sigma,l,k,use_SRHT,kk,random_seed,error_nuc,runtime
+,,,,10,3,,,100000,64,32,0,8,,,
+,,,,12,3,,,100000,64,32,1,8,,,

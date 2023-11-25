@@ -1,9 +1,5 @@
 import counter as ct
 import numpy as np
+from utility import *
 
-l = 1002
-k = 13
-
-bounds = np.ceil(np.linspace(0,l,k+1))
-
-print(np.random.randint(bounds[:k], bounds[1:], size=k))
+print(settings_from_csv(2))

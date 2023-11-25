@@ -6,14 +6,10 @@ import math
 import time
 from scipy.linalg import norm, cholesky, qr, svd, solve_triangular
 from data_generation import *
+from utility import *
 
 def strong_transpose(M):
 	return np.array([np.copy(M[:,i]) for i in range(M.shape[1])])
-
-def stopp(comm, rank):
-	if rank == 0: input("continue?")
-	dummy = 0
-	dummy = comm.bcast(dummy, root=0)
 
 def block_SRHT(n, l, col, rc_local, general_random_seed, col_random_seed):
 	general_rng = np.random.default_rng(general_random_seed)
@@ -37,19 +33,34 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 s = comm.Get_size()
 
-n = 2**10
-l = 64
-k = 32
+#In the following section we read from a csv file the settings for the test
 
-use_SRHT = False 	#change to False to use short axis sketching
+(n,l,k,use_SRHT,kk) = (None, None, None, None, None)
+if rank == 0:
+	line_id = get_counter()
+	n, matrix_type, R, p, sigma, l, k, use_SRHT, kk = settings_from_csv(line_id)
+	print(n, matrix_type, R, p, sigma, l, k, use_SRHT, kk)
+(n,l,k,use_SRHT,kk) = comm.bcast((n,l,k,use_SRHT,kk), root = 0)
 
 assert n > 0 and math.log2(n).is_integer() and int(math.log2(n))%2 == 0, "n must be a power of 4"
 assert n//s >= l, "l is too big, TSQR will fail, change it to " + str(n//s) + " or less"
 assert l >= k, "l must be greater or equal than k"
+assert kk <= l, "kk must be smaller or equal than l"
 
 A = None
 if rank == 0:
-	A = A_YearPredictionMSD(n, 10**5)
+	match matrix_type:
+		case 0:
+			A = A_PolyDecay(n, R, p)
+		case 1:
+			A = A_ExpDecay(n, R, p)
+		case 2:
+			A = A_MNIST(n, sigma)
+		case 3:
+			A = A_YearPredictionMSD(n, sigma)
+		case _:
+			raise Exception("Unknown matrix type")
+
 	wt = MPI.Wtime()
 
 #========block distribution of A========
@@ -82,7 +93,7 @@ col_random_seed = general_random_seed + col + 1
 if use_SRHT:
 	omega_local = block_SRHT(n, l, col, rc_local, general_random_seed, col_random_seed)
 else:
-	omega_local = block_short_axis(n, l, col, rc_local, col_random_seed)
+	omega_local = block_short_axis(n, l, col, rc_local, col_random_seed, kk)
 
 #========block multiplications========
 C_prod = A_local @ omega_local
@@ -172,18 +183,16 @@ for step in reversed(range(TSQR_steps)):
 	else:
 		activeComm = comm.Split(color = 0, key = rank)
 
-#========final multiplication========
+#========final gather========
 Uhat_k = np.empty((n,k))
 comm.Gatherv(Uhat_k_local, Uhat_k, root = 0)
 
 if rank == 0:
+	wt = MPI.Wtime() - wt
+	print("lowrank approximation completed")
+	
+	#we keep the following multiplication outside the runtime because normally it doesn't make sense to compute it
 	A_nystrom = Uhat_k @ np.diag(S_k**2) @ Uhat_k.T
 	
-	print("finished")
+	
 	print(np.linalg.norm(A - A_nystrom, ord='nuc')/np.linalg.norm(A, ord='nuc'))
-
-#new_comm.Bcast(S_k, root=0)
-#A_nystrom_local = (Uhat_k_local * S_k) @ Uhat_k_local.T
-#A_nystrom = np.empty((n,n))
-#new_comm.Reduce(A_nystrom_local, A_nystrom, op = MPI.SUM, root = 0)
-
