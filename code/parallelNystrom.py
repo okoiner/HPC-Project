@@ -35,11 +35,12 @@ s = comm.Get_size()
 
 #In the following section we read from a csv file the settings for the test
 
+save_results = True
 (n,l,k,use_SRHT,kk) = (None, None, None, None, None)
 if rank == 0:
 	line_id = get_counter()
 	n, matrix_type, R, p, sigma, l, k, use_SRHT, kk = settings_from_csv(line_id)
-	print(n, matrix_type, R, p, sigma, l, k, use_SRHT, kk)
+	print_settings(n, matrix_type, R, p, sigma, l, k, use_SRHT, kk, s)
 (n,l,k,use_SRHT,kk) = comm.bcast((n,l,k,use_SRHT,kk), root = 0)
 
 assert n > 0 and math.log2(n).is_integer() and int(math.log2(n))%2 == 0, "n must be a power of 4"
@@ -132,10 +133,6 @@ else:
 toFactor = Z_local
 Q_list = []
 
-toFactorrr = np.empty((n,l))
-comm.Gatherv(toFactor, toFactorrr, root = 0)
-if rank == 0: np.save("parallel", toFactorrr)
-
 is_active = True
 TSQR_steps = int(math.log2(s))
 for step in range(TSQR_steps):
@@ -179,7 +176,6 @@ for step in reversed(range(TSQR_steps)):
 		else:
 			Uhat_k_local = activeComm.recv(source = 0)
 			Uhat_k_local = Q_list[step] @ Uhat_k_local
-		
 	else:
 		activeComm = comm.Split(color = 0, key = rank)
 
@@ -194,5 +190,8 @@ if rank == 0:
 	#we keep the following multiplication outside the runtime because normally it doesn't make sense to compute it
 	A_nystrom = Uhat_k @ np.diag(S_k**2) @ Uhat_k.T
 	
-	
-	print(np.linalg.norm(A - A_nystrom, ord='nuc')/np.linalg.norm(A, ord='nuc'))
+	error_nuc = np.linalg.norm(A - A_nystrom, ord='nuc')/np.linalg.norm(A, ord='nuc')
+	if save_results:
+		save_results_to_csv(line_id, s, general_random_seed, error_nuc, wt)
+		add_counter(1)
+	print_results(error_nuc, wt)

@@ -1,3 +1,3 @@
 date&time,computer,n_processors,parallel/sequencial,log2_n,matrix_type,R,p,sigma,l,k,use_SRHT,kk,random_seed,error_nuc,runtime
-,,,,10,3,,,100000,64,32,0,8,,,
-,,,,12,3,,,100000,64,32,1,8,,,
+2023-11-26 02:32:28,Ubuntu-stefano,4,par,10,3,,,100000,64,32,0,8,42,7.373565295716482e-05,0.063761263
+2023-11-26 02:32:36,Ubuntu-stefano,4,par,10,2,,,100,64,32,1,8,42,0.0034740396709497614,0.053829387
