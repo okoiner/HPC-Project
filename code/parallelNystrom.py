@@ -38,7 +38,7 @@ rank = comm.Get_rank()
 s = comm.Get_size()
 
 #In the following section we read from a csv file the settings for the test
-save_results = False
+save_results = True
 (n,l,k,sketch_matrix,nz) = (None, None, None, None, None)
 if rank == 0:
 	print("")
@@ -203,7 +203,7 @@ if rank == 0:
 	#	_, realS, _ = svd(A, full_matrices=False)
 	#	np.save("svdss.npy", np.array([S_k**2, realS[:k]]))
 	
-	error_nuc = np.linalg.norm(A - A_nystrom, ord='nuc')/np.linalg.norm(A, ord='nuc')
+	error_nuc = np.linalg.norm(A - A_nystrom, ord='nuc')/nuc_norm_A(matrix_type, n, R, p, sigma)
 	if save_results:
 		save_results_to_csv(line_id, s, cholesky_success, general_random_seed, error_nuc, wt)
 		add_counter(1)

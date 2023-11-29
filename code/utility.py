@@ -1,6 +1,7 @@
 import numpy as np
 import csv
 import datetime
+from data_generation import *
 
 def set_counter(n, name = "default"):
 	np.save("../data/utilities/counter_" + name + ".npy", np.array(int(n), dtype=int))
@@ -80,6 +81,37 @@ def save_results_to_csv(line_id, n_processors, cholesky_success, random_seed, er
 	with open("../testing/" + file_name, 'w', newline='') as file:
 		writer = csv.writer(file)
 		writer.writerows(data)
+
+def nuc_norm_A(matrix_type, n, R, p, sigma):
+	match matrix_type:
+		case 0:
+			try:
+				return np.load("../data/nuclear_norms/nuc_norm_PolyDecay_" + str(n) + "_" + str(R) + "_" + str(p) + ".npy")
+			except FileNotFoundError:
+				nuc_norm = np.linalg.norm(A_PolyDecay(n, R, p), ord='nuc')
+				np.save("../data/nuclear_norms/nuc_norm_PolyDecay_" + str(n) + "_" + str(R) + "_" + str(p) + ".npy", nuc_norm)
+				return nuc_norm
+		case 1:
+			try:
+				return np.load("../data/nuclear_norms/nuc_norm_ExpDecay_" + str(n) + "_" + str(R) + "_" + str(p) + ".npy")
+			except FileNotFoundError:
+				nuc_norm = np.linalg.norm(A_ExpDecay(n, R, p), ord='nuc')
+				np.save("../data/nuclear_norms/nuc_norm_ExpDecay_" + str(n) + "_" + str(R) + "_" + str(p) + ".npy", nuc_norm)
+				return nuc_norm
+		case 2:
+			try:
+				return np.load("../data/nuclear_norms/nuc_norm_MNIST_" + str(n) + "_" + str(sigma) + ".npy")
+			except FileNotFoundError:
+				nuc_norm = np.linalg.norm(A_MNIST(n, sigma), ord='nuc')
+				np.save("../data/nuclear_norms/nuc_norm_MNIST_" + str(n) + "_" + str(sigma) + ".npy", nuc_norm)
+				return nuc_norm
+		case 3:
+			try:
+				return np.load("../data/nuclear_norms/nuc_norm_YearPredictionMSD_" + str(n) + "_" + str(sigma) + ".npy")
+			except FileNotFoundError:
+				nuc_norm = np.linalg.norm(A_YearPredictionMSD(n, sigma), ord='nuc')
+				np.save("../data/nuclear_norms/nuc_norm_YearPredictionMSD_" + str(n) + "_" + str(sigma) + ".npy", nuc_norm)
+				return nuc_norm
 
 def print_results(error_nuc, wt):
 	print("error_nuc = " + str(error_nuc) + ", runtime = " + str(wt))
