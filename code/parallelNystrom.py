@@ -43,8 +43,8 @@ save_results = True
 if rank == 0:
 	print("")
 	line_id = get_counter()
-	n, matrix_type, R, p, sigma, l, k, sketch_matrix, nz = get_settings_from_csv(line_id)
-	print_settings(n, matrix_type, R, p, sigma, l, k, sketch_matrix, nz, s)
+	n, matrix_type, RR, p, sigma, l, k, sketch_matrix, nz = get_settings_from_csv(line_id)
+	print_settings(n, matrix_type, RR, p, sigma, l, k, sketch_matrix, nz, s)
 (n,l,k,sketch_matrix,nz) = comm.bcast((n,l,k,sketch_matrix,nz), root = 0)
 
 #assert n > 0 and math.log2(n).is_integer() and int(math.log2(n))%2 == 0, "n must be a power of 4"
@@ -56,9 +56,9 @@ A = None
 if rank == 0:
 	match matrix_type:
 		case 0:
-			A = A_PolyDecay(n, R, p)
+			A = A_PolyDecay(n, RR, p)
 		case 1:
-			A = A_ExpDecay(n, R, p)
+			A = A_ExpDecay(n, RR, p)
 		case 2:
 			A = A_MNIST(n, sigma)
 		case 3:
@@ -203,7 +203,7 @@ if rank == 0:
 	#	_, realS, _ = svd(A, full_matrices=False)
 	#	np.save("svdss.npy", np.array([S_k**2, realS[:k]]))
 	
-	error_nuc = np.linalg.norm(A - A_nystrom, ord='nuc')/nuc_norm_A(matrix_type, n, R, p, sigma)
+	error_nuc = np.linalg.norm(A - A_nystrom, ord='nuc')/nuc_norm_A(matrix_type, n, RR, p, sigma)
 	if save_results:
 		save_results_to_csv(line_id, s, cholesky_success, general_random_seed, error_nuc, wt)
 		add_counter(1)
