@@ -1,4 +1,0 @@
-date&time,computer,n_processors,parallel_sequencial,log2_n,matrix_type,R,p,sigma,l,k,sketch_matrix,nz,chol_success,random_seed,error_nuc,runtime
-2023-11-28 16:33:11,Ubuntu-stefano,1,seq,8,3,,,100000,64,32,0,8,1,845705217,4.3364198025263505e-05,0.031161785125732422
-,,,,8,3,,,100000,50,32,0,8,,,,
-,,,,8,3,,,100000,40,32,0,8,,,,
