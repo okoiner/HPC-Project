@@ -165,3 +165,4 @@ data/dataMNISTnorm.npy
 data/dataYearPredictionMSDreduced.npy
 data/utilities/*
 data/generated_matrices/*
+data/nuclear_norms/nuc_norm_*
