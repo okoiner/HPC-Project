@@ -86,31 +86,31 @@ def nuc_norm_A(matrix_type, n, R, p, sigma):
 	match matrix_type:
 		case 0:
 			try:
-				return np.load("../data/nuclear_norms/nuc_norm_PolyDecay_" + str(n) + "_" + str(R) + "_" + str(p) + ".npy")
+				return np.load("../data/nuclear_norms/nn_PolyDecay_" + str(n) + "_" + str(R) + "_" + str(p) + ".npy")
 			except FileNotFoundError:
 				nuc_norm = np.linalg.norm(A_PolyDecay(n, R, p), ord='nuc')
-				np.save("../data/nuclear_norms/nuc_norm_PolyDecay_" + str(n) + "_" + str(R) + "_" + str(p) + ".npy", nuc_norm)
+				np.save("../data/nuclear_norms/nn_PolyDecay_" + str(n) + "_" + str(R) + "_" + str(p) + ".npy", nuc_norm)
 				return nuc_norm
 		case 1:
 			try:
-				return np.load("../data/nuclear_norms/nuc_norm_ExpDecay_" + str(n) + "_" + str(R) + "_" + str(p) + ".npy")
+				return np.load("../data/nuclear_norms/nn_ExpDecay_" + str(n) + "_" + str(R) + "_" + str(p) + ".npy")
 			except FileNotFoundError:
 				nuc_norm = np.linalg.norm(A_ExpDecay(n, R, p), ord='nuc')
-				np.save("../data/nuclear_norms/nuc_norm_ExpDecay_" + str(n) + "_" + str(R) + "_" + str(p) + ".npy", nuc_norm)
+				np.save("../data/nuclear_norms/nn_ExpDecay_" + str(n) + "_" + str(R) + "_" + str(p) + ".npy", nuc_norm)
 				return nuc_norm
 		case 2:
 			try:
-				return np.load("../data/nuclear_norms/nuc_norm_MNIST_" + str(n) + "_" + str(sigma) + ".npy")
+				return np.load("../data/nuclear_norms/nn_MNIST_" + str(n) + "_" + str(sigma) + ".npy")
 			except FileNotFoundError:
 				nuc_norm = np.linalg.norm(A_MNIST(n, sigma), ord='nuc')
-				np.save("../data/nuclear_norms/nuc_norm_MNIST_" + str(n) + "_" + str(sigma) + ".npy", nuc_norm)
+				np.save("../data/nuclear_norms/nn_MNIST_" + str(n) + "_" + str(sigma) + ".npy", nuc_norm)
 				return nuc_norm
 		case 3:
 			try:
-				return np.load("../data/nuclear_norms/nuc_norm_YearPredictionMSD_" + str(n) + "_" + str(sigma) + ".npy")
+				return np.load("../data/nuclear_norms/nn_YearPredictionMSD_" + str(n) + "_" + str(sigma) + ".npy")
 			except FileNotFoundError:
 				nuc_norm = np.linalg.norm(A_YearPredictionMSD(n, sigma), ord='nuc')
-				np.save("../data/nuclear_norms/nuc_norm_YearPredictionMSD_" + str(n) + "_" + str(sigma) + ".npy", nuc_norm)
+				np.save("../data/nuclear_norms/nn_YearPredictionMSD_" + str(n) + "_" + str(sigma) + ".npy", nuc_norm)
 				return nuc_norm
 
 def print_results(error_nuc, wt):
