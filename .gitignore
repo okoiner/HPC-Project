@@ -160,8 +160,8 @@ cython_debug/
 #.idea/
 
 # It's better to manually import these files or to generate them :)
-code/data/dataMNIST.npy
-code/data/dataYearPredictionMSDreduced.npy
-code/data/rawData/
-code/data/A_MNIST_*
-code/data/A_YearPredictionMSD_*
+data/dataMNIST.npy
+data/dataMNISTnorm.npy
+data/dataYearPredictionMSDreduced.npy
+data/utilities/*
+data/generated_matrices/*
