@@ -19,34 +19,38 @@ def block_SRHT(n, l, col, rc_local, general_random_seed, col_random_seed):
 	signs = col_rng.choice([-1, 1], size=rc_local)
 	return np.fromfunction(np.vectorize(lambda i, j: signs[i]*(-1)**(bin((i + col*rc_local) & randCol[j]).count("1"))), (rc_local, l), dtype=int) / math.sqrt(l)
 
-def block_short_axis(n, l, col, rc_local, col_random_seed, kk = 8):
+def block_short_axis(l, col, rc_local, col_random_seed, nz):
 	col_rng = np.random.default_rng(col_random_seed)
 	
 	sketch = np.zeros((rc_local, l), dtype='d')
-	bounds = np.ceil(np.linspace(0,l,kk+1))
+	bounds = np.ceil(np.linspace(0,l,nz+1))
 	for i in range(rc_local):
-		 col = col_rng.integers(bounds[:kk], bounds[1:], size=kk)
-		 sketch[i,col] = col_rng.choice([-1, 1], size=kk)*col_rng.uniform(1., 2., size=kk)
+		 col = col_rng.integers(bounds[:nz], bounds[1:], size=nz)
+		 sketch[i,col] = col_rng.choice([-1, 1], size=nz)*col_rng.uniform(1., 2., size=nz)
 	return sketch
+
+def block_gaussian(l, rc_local, col_random_seed):
+	col_rng = np.random.default_rng(col_random_seed)
+	return col_rng.normal(size = (rc_local, l))
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 s = comm.Get_size()
 
 #In the following section we read from a csv file the settings for the test
-
-save_results = True
-(n,l,k,use_SRHT,kk) = (None, None, None, None, None)
+save_results = False
+(n,l,k,sketch_matrix,nz) = (None, None, None, None, None)
 if rank == 0:
+	print("")
 	line_id = get_counter()
-	n, matrix_type, R, p, sigma, l, k, use_SRHT, kk = settings_from_csv(line_id)
-	print_settings(n, matrix_type, R, p, sigma, l, k, use_SRHT, kk, s)
-(n,l,k,use_SRHT,kk) = comm.bcast((n,l,k,use_SRHT,kk), root = 0)
+	n, matrix_type, R, p, sigma, l, k, sketch_matrix, nz = get_settings_from_csv(line_id)
+	print_settings(n, matrix_type, R, p, sigma, l, k, sketch_matrix, nz, s)
+(n,l,k,sketch_matrix,nz) = comm.bcast((n,l,k,sketch_matrix,nz), root = 0)
 
-assert n > 0 and math.log2(n).is_integer() and int(math.log2(n))%2 == 0, "n must be a power of 4"
+#assert n > 0 and math.log2(n).is_integer() and int(math.log2(n))%2 == 0, "n must be a power of 4"
 assert n//s >= l, "l is too big, TSQR will fail, change it to " + str(n//s) + " or less"
 assert l >= k, "l must be greater or equal than k"
-assert kk <= l, "kk must be smaller or equal than l"
+assert nz <= l, "nz must be smaller or equal than l"
 
 A = None
 if rank == 0:
@@ -91,10 +95,15 @@ general_random_seed = comm.bcast(general_random_seed, root = 0)
 col_random_seed = general_random_seed + col + 1
 #local_random_seed = general_random_seed + n_rowcol + rank + 1
 
-if use_SRHT:
-	omega_local = block_SRHT(n, l, col, rc_local, general_random_seed, col_random_seed)
-else:
-	omega_local = block_short_axis(n, l, col, rc_local, col_random_seed, kk)
+match sketch_matrix:
+	case 0:
+		omega_local = block_SRHT(n, l, col, rc_local, general_random_seed, col_random_seed)
+	case 1:
+		omega_local = block_short_axis(l, col, rc_local, col_random_seed, nz)
+	case 2:
+		omega_local = block_gaussian(l, rc_local, col_random_seed)
+	case _:
+		raise Exception("Unknown sketch type")
 
 #========block multiplications========
 C_prod = A_local @ omega_local
@@ -117,7 +126,7 @@ if rank == 0:
 		print(":(")
 		cholesky_success = False
 		U_B, S_B, Vt_B = svd(B, full_matrices=False)
-		S_pseudo_sqrt = np.array([1./s_b**0.5 if s_b < 1e-4 else 0 for s_b in S_B])
+		S_pseudo_sqrt = np.array([(1./s_b)**0.5 if s_b != 0 else 0. for s_b in S_B], dtype = 'd')
 		L = (U_B * S_pseudo_sqrt) @ U_B.T
 else:
 	L = np.empty((l,l))
@@ -190,8 +199,12 @@ if rank == 0:
 	#we keep the following multiplication outside the runtime because normally it doesn't make sense to compute it
 	A_nystrom = Uhat_k @ np.diag(S_k**2) @ Uhat_k.T
 	
+	#if False:
+	#	_, realS, _ = svd(A, full_matrices=False)
+	#	np.save("svdss.npy", np.array([S_k**2, realS[:k]]))
+	
 	error_nuc = np.linalg.norm(A - A_nystrom, ord='nuc')/np.linalg.norm(A, ord='nuc')
 	if save_results:
-		save_results_to_csv(line_id, s, general_random_seed, error_nuc, wt)
+		save_results_to_csv(line_id, s, cholesky_success, general_random_seed, error_nuc, wt)
 		add_counter(1)
 	print_results(error_nuc, wt)

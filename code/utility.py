@@ -2,17 +2,30 @@ import numpy as np
 import csv
 import datetime
 
-def set_counter(n, name = "counter"):
-	np.save("data/counter_" + name + ".npy", np.array(int(n), dtype=int))
+def set_counter(n, name = "default"):
+	np.save("../data/utilities/counter_" + name + ".npy", np.array(int(n), dtype=int))
 
-def get_counter(name = "counter"):
-	return np.load("data/counter_" + name + ".npy")
+def get_counter(name = "default"):
+	return np.load("../data/utilities/counter_" + name + ".npy")
 
-def add_counter(n, name = "counter"):
+def add_counter(n, name = "default"):
 	set_counter(get_counter(name) + n, name)
 
-def settings_from_csv(line_id):
-	with open("data/test_results.csv", newline='') as csvfile:
+def get_computer_name():
+    with open("../data/utilities/computer_name.txt", 'r', encoding='utf-8') as file:
+        computer_name = file.read()
+    return computer_name[:-1]
+    
+def get_test_name():
+    with open("../data/utilities/test_name.txt", 'r', encoding='utf-8') as file:
+        computer_name = file.read()
+    return computer_name
+
+def get_settings_from_csv(line_id, file_name = None):
+	if file_name == None:
+		file_name = get_test_name()
+	print("Getting settings from line " + str(line_id) + " in " + file_name)
+	with open("../testing/" + file_name, newline='') as csvfile:
 		reader = csv.reader(csvfile)
 		for i, row in enumerate(reader):
 			if i == line_id:
@@ -27,13 +40,13 @@ def settings_from_csv(line_id):
 	sigma = int(row[8]) if len(row[8]) > 0 else 0
 	l = int(row[9])
 	k = int(row[10])
-	use_SRHT = False if row[11] == '0' else True
-	kk = int(row[12]) if len(row[12]) > 0 else 0
+	sketch_matrix = int(row[11])
+	nz = int(row[12]) if len(row[12]) > 0 else 0
 	
-	return n, matrix_type, R, p, sigma, l, k, use_SRHT, kk
+	return n, matrix_type, R, p, sigma, l, k, sketch_matrix, nz
 
-def print_settings(n, matrix_type, R, p, sigma, l, k, use_SRHT, kk, n_processors):
-	out = "Settings: n = " + str(n) + "\nmatrix_type: "
+def print_settings(n, matrix_type, R, p, sigma, l, k, sketch_matrix, nz, n_processors):
+	out = "Settings: n = " + str(n) + "\nMatrix_type: "
 	match matrix_type:
 		case 0:
 			out = out + "PolyDecay, R = " + str(R) + ", p = " + str(p) + "\n"
@@ -43,55 +56,30 @@ def print_settings(n, matrix_type, R, p, sigma, l, k, use_SRHT, kk, n_processors
 			out = out + "A_MNIST, sigma = " + str(sigma) + "\n"
 		case 3:
 			out = out + "YearPredictionMSD, sigma = " + str(sigma) + "\n"
-	out = out + "sketch " + ("SRHT" if use_SRHT else "short-axis") + ", l = " + str(l) + (", kk = " + str(kk) if not use_SRHT else "") + "\nk = " + str(k) + ", in " + ("parallel with " + str(n_processors) + " processors" if n_processors > 1 else " sequential")
+	sketch_dict = {0: "SRHT", 1: "short-axis", 2: "gaussian"}
+	out = out + "sketch " + (sketch_dict[sketch_matrix]) + ", l = " + str(l) + (", nz = " + str(nz) if sketch_matrix == 1 else "") + "\nk = " + str(k) + ", in " + ("parallel with " + str(n_processors) + " processors" if n_processors > 1 else "sequential")
 	print(out)
 
-def read_computer_name():
-    with open("data/computer_name.txt", 'r', encoding='utf-8') as file:
-        computer_name = file.read()
-    return computer_name[:-1]
-
-def save_results_to_csv(line_id, n_processors, random_seed, error_nuc, wt):
-	with open("data/test_results.csv", newline='') as file:
+def save_results_to_csv(line_id, n_processors, cholesky_success, random_seed, error_nuc, wt, file_name = None):
+	if file_name == None:
+		file_name = get_test_name()
+	
+	with open("../testing/" + file_name, newline='') as file:
 		reader = csv.reader(file)
 		data = list(reader)
 
 	data[line_id][0] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-	data[line_id][1] = read_computer_name()
+	data[line_id][1] = get_computer_name()
 	data[line_id][2] = str(n_processors)
 	data[line_id][3] = "par" if n_processors > 1 else "seq"
-	data[line_id][13]= str(random_seed)
-	data[line_id][14]= str(error_nuc)
-	data[line_id][15]= str(wt)
+	data[line_id][13]= 1 if cholesky_success else 0
+	data[line_id][14]= str(random_seed)
+	data[line_id][15]= str(error_nuc)
+	data[line_id][16]= str(wt)
 
-	with open("data/test_results.csv", 'w', newline='') as file:
+	with open("../testing/" + file_name, 'w', newline='') as file:
 		writer = csv.writer(file)
 		writer.writerows(data)
 
 def print_results(error_nuc, wt):
 	print("error_nuc = " + str(error_nuc) + ", runtime = " + str(wt))
-
-#date&time
-#computer_owner
-#n
-#matrix_type
-#R
-#p
-#sigma
-#parallel/sequencial
-#n processors
-#l
-#k
-#sketch_matrix
-#random_seed
-#error_nuc
-#runtime
-
-#n
-#matrix_type
-#R
-#p
-#sigma
-#l
-#k
-#sketch_type

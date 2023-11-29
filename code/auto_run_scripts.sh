@@ -1,4 +1,5 @@
 #!/bin/bash
-/usr/bin/python3 script.py <<EOF
-mamma
-EOF
+for i in {1..40}
+do
+   mpirun -n 4 python3 parallelNystrom.py
+done
