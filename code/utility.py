@@ -113,5 +113,6 @@ def nuc_norm_A(matrix_type, n, R, p, sigma):
 				np.save("../data/nuclear_norms/nuc_norm_YearPredictionMSD_" + str(n) + "_" + str(sigma) + ".npy", nuc_norm)
 				return nuc_norm
 
-def print_results(error_nuc, wt):
+def print_results(error_nuc, wt, cholesky_success, random_seed):
 	print("error_nuc = " + str(error_nuc) + ", runtime = " + str(wt))
+	print("cholesky " + ("succeded" if cholesky_success else "failed") + ", random_seed = " + str(random_seed))

@@ -90,7 +90,7 @@ A_local = strong_transpose(A_local_transp)
 #========block generation of omega (SRHT)========
 general_random_seed = None
 if rank == 0:
-	general_random_seed = 42 #np.random.randint(2**30)
+	general_random_seed = np.random.randint(2**30)
 general_random_seed = comm.bcast(general_random_seed, root = 0)
 col_random_seed = general_random_seed + col + 1
 #local_random_seed = general_random_seed + n_rowcol + rank + 1
@@ -207,4 +207,4 @@ if rank == 0:
 	if save_results:
 		save_results_to_csv(line_id, s, cholesky_success, general_random_seed, error_nuc, wt)
 		add_counter(1)
-	print_results(error_nuc, wt)
+	print_results(error_nuc, wt, cholesky_success, general_random_seed)
