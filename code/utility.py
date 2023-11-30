@@ -82,6 +82,26 @@ def save_results_to_csv(line_id, n_processors, cholesky_success, random_seed, er
 		writer = csv.writer(file)
 		writer.writerows(data)
 
+def save_svd_to_csv(line_id, approx_sv, real_sv, file_name = None):
+	print("Saving singular values to csv")
+	
+	np.save("../data/singular_values/sv_" + str(get_counter("singular_values")).zfill(3) + ".npy", np.array([approx_sv, real_sv]))
+	
+	if file_name == None:
+		file_name = get_test_name()
+	
+	with open("../testing/" + file_name, newline='') as file:
+		reader = csv.reader(file)
+		data = list(reader)
+	
+	data[line_id][17]= "sv_" + str(get_counter("singular_values")).zfill(3) + ".npy"
+
+	with open("../testing/" + file_name, 'w', newline='') as file:
+		writer = csv.writer(file)
+		writer.writerows(data)
+	
+	add_counter(1, "singular_values")
+
 def nuc_norm_A(matrix_type, n, R, p, sigma):
 	match matrix_type:
 		case 0:

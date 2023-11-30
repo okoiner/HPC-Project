@@ -39,6 +39,7 @@ s = comm.Get_size()
 
 #In the following section we read from a csv file the settings for the test
 save_results = True
+save_svd = False
 (n,l,k,sketch_matrix,nz) = (None, None, None, None, None)
 if rank == 0:
 	print("")
@@ -199,9 +200,9 @@ if rank == 0:
 	#we keep the following multiplication outside the runtime because normally it doesn't make sense to compute it
 	A_nystrom = Uhat_k @ np.diag(S_k**2) @ Uhat_k.T
 	
-	#if False:
-	#	_, realS, _ = svd(A, full_matrices=False)
-	#	np.save("svdss.npy", np.array([S_k**2, realS[:k]]))
+	if save_svd:
+		_, realS, _ = svd(A, full_matrices=False)
+		save_svd_to_csv(line_id, S_k**2, realS[:k])
 	
 	error_nuc = np.linalg.norm(A - A_nystrom, ord='nuc')/nuc_norm_A(matrix_type, n, RR, p, sigma)
 	if save_results:
