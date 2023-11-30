@@ -31,14 +31,14 @@ def block_gaussian(n, l, random_seed):
 
 save_results = True
 line_id = get_counter()
-n, matrix_type, R, p, sigma, l, k, sketch_matrix, nz = get_settings_from_csv(line_id)
-print_settings(n, matrix_type, R, p, sigma, l, k, sketch_matrix, nz, 1)
+n, matrix_type, RR, p, sigma, l, k, sketch_matrix, nz = get_settings_from_csv(line_id)
+print_settings(n, matrix_type, RR, p, sigma, l, k, sketch_matrix, nz, 1)
 
 match matrix_type:
 	case 0:
-		A = A_PolyDecay(n, R, p)
+		A = A_PolyDecay(n, RR, p)
 	case 1:
-		A = A_ExpDecay(n, R, p)
+		A = A_ExpDecay(n, RR, p)
 	case 2:
 		A = A_MNIST(n, sigma)
 	case 3:
@@ -89,8 +89,8 @@ print("lowrank approximation completed")
 #we keep the following multiplication outside the runtime because normally it doesn't make sense to compute it
 A_nystrom = Uhat_k @ np.diag(S_k**2) @ Uhat_k.T
 
-error_nuc = np.linalg.norm(A - A_nystrom, ord='nuc')/np.linalg.norm(A, ord='nuc')
+error_nuc = np.linalg.norm(A - A_nystrom, ord='nuc')/nuc_norm_A(matrix_type, n, RR, p, sigma)
 if save_results:
 	save_results_to_csv(line_id, 1, cholesky_success, random_seed, error_nuc, wt)
 	add_counter(1)
-print_results(error_nuc, wt)
+print_results(error_nuc, wt, cholesky_success, general_random_seed)
