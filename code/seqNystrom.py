@@ -93,4 +93,4 @@ error_nuc = np.linalg.norm(A - A_nystrom, ord='nuc')/nuc_norm_A(matrix_type, n, 
 if save_results:
 	save_results_to_csv(line_id, 1, cholesky_success, random_seed, error_nuc, wt)
 	add_counter(1)
-print_results(error_nuc, wt, cholesky_success, general_random_seed)
+print_results(error_nuc, wt, cholesky_success, random_seed)
