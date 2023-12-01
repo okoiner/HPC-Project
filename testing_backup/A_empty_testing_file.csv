@@ -1,0 +1,2 @@
+date&time,computer,n_processors,parallel_sequencial,log2_n,matrix_type,R,p,sigma,l,k,sketch_matrix,nz,chol_success,random_seed,error_nuc,runtime
+,,,,12,2,,,100,64,32,0,8,,,,

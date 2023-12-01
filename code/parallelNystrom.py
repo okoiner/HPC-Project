@@ -11,7 +11,7 @@ from utility import *
 def strong_transpose(M):
 	return np.array([np.copy(M[:,i]) for i in range(M.shape[1])])
 
-def block_SRHT(n, l, col, rc_local, general_random_seed, col_random_seed):
+def SRHT(n, l, col, rc_local, general_random_seed, col_random_seed):
 	general_rng = np.random.default_rng(general_random_seed)
 	col_rng = np.random.default_rng(col_random_seed)
 
@@ -32,6 +32,16 @@ def block_short_axis(l, col, rc_local, col_random_seed, nz):
 def block_gaussian(l, rc_local, col_random_seed):
 	col_rng = np.random.default_rng(col_random_seed)
 	return col_rng.normal(size = (rc_local, l))
+
+def block_SRHT(l, rc_local, general_random_seed, col_random_seed):
+	general_rng = np.random.default_rng(general_random_seed)
+	col_rng = np.random.default_rng(col_random_seed)
+	
+	randCol = general_rng.choice(n, l, replace=False)
+	signsRows = col_rng.choice([-1, 1], size=rc_local)
+	signsCols = col_rng.choice([-1, 1], size=l)
+	
+	return np.fromfunction(np.vectorize(lambda i, j: signsRows[i]*signsCols[j]*(-1)**(bin(i & randCol[j]).count("1"))), (rc_local, l), dtype=int) / math.sqrt(l)
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -98,11 +108,13 @@ col_random_seed = general_random_seed + col + 1
 
 match sketch_matrix:
 	case 0:
-		omega_local = block_SRHT(n, l, col, rc_local, general_random_seed, col_random_seed)
+		omega_local = SRHT(n, l, col, rc_local, general_random_seed, col_random_seed)
 	case 1:
 		omega_local = block_short_axis(l, col, rc_local, col_random_seed, nz)
 	case 2:
 		omega_local = block_gaussian(l, rc_local, col_random_seed)
+	case 3:
+		omega_local = block_SRHT(l, rc_local, general_random_seed, col_random_seed)
 	case _:
 		raise Exception("Unknown sketch type")
 

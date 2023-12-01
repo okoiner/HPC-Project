@@ -57,7 +57,7 @@ def print_settings(n, matrix_type, R, p, sigma, l, k, sketch_matrix, nz, n_proce
 			out = out + "A_MNIST, sigma = " + str(sigma) + "\n"
 		case 3:
 			out = out + "YearPredictionMSD, sigma = " + str(sigma) + "\n"
-	sketch_dict = {0: "SRHT", 1: "short-axis", 2: "gaussian"}
+	sketch_dict = {0: "SRHT", 1: "short-axis", 2: "gaussian", 3:"block_SRHT"}
 	out = out + "sketch " + (sketch_dict[sketch_matrix]) + ", l = " + str(l) + (", nz = " + str(nz) if sketch_matrix == 1 else "") + "\nk = " + str(k) + ", in " + ("parallel with " + str(n_processors) + " processors" if n_processors > 1 else "sequential")
 	print(out)
 
