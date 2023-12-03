@@ -219,8 +219,7 @@ if rank == 0:
 			realS = np.diag(A)
 		save_svd_to_csv(line_id, S_k**2, realS[:k])
 	
-	# error_nuc = np.linalg.norm(A - A_nystrom, ord='nuc')/nuc_norm_A(matrix_type, n, RR, p, sigma)
-	error_nuc = np.linalg.norm(A - A_nystrom, ord='nuc')/np.linalg.norm(A, ord='nuc')
+	error_nuc = np.linalg.norm(A - A_nystrom, ord='nuc')/nuc_norm_A(matrix_type, n, RR, p, sigma)
 	if save_results:
 		save_results_to_csv(line_id, s, cholesky_success, general_random_seed, error_nuc, wt)
 		add_counter(1)
