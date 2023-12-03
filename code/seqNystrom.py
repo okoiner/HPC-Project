@@ -70,7 +70,7 @@ match sketch_matrix:
 	case 2:
 		omega = block_gaussian(n, l, random_seed)
 	case 3:
-		omega = block_SRHT(n, l, col_random_seed)
+		omega = block_SRHT(n, l, random_seed)
 	case _:
 		raise Exception("Unknown sketch type")
 

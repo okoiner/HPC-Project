@@ -213,7 +213,10 @@ if rank == 0:
 	A_nystrom = Uhat_k @ np.diag(S_k**2) @ Uhat_k.T
 	
 	if save_svd:
-		_, realS, _ = svd(A, full_matrices=False)
+		if matrix_type >= 2:
+			_, realS, _ = svd(A, full_matrices=False)
+		else:
+			realS = np.diag(A)
 		save_svd_to_csv(line_id, S_k**2, realS[:k])
 	
 	error_nuc = np.linalg.norm(A - A_nystrom, ord='nuc')/nuc_norm_A(matrix_type, n, RR, p, sigma)
