@@ -32,7 +32,7 @@ def block_gaussian_sketch(n, l, random_seed):
 def block_SRHT(n, l, random_seed):
 	col_rng = np.random.default_rng(random_seed)
 	
-	randCol = general_rng.choice(n, l, replace=False)
+	randCol = col_rng.choice(n, l, replace=False)
 	signsRows = col_rng.choice([-1, 1], size=n)
 	signsCols = col_rng.choice([-1, 1], size=l)
 	
@@ -70,7 +70,7 @@ match sketch_matrix:
 	case 2:
 		omega = block_gaussian(n, l, random_seed)
 	case 3:
-		omega = block_SRHT(n, l, col_random_seed)
+		omega = block_SRHT(n, l, random_seed)
 	case _:
 		raise Exception("Unknown sketch type")
 
