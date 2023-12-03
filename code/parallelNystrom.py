@@ -37,7 +37,7 @@ def block_SRHT(l, rc_local, general_random_seed, col_random_seed):
 	general_rng = np.random.default_rng(general_random_seed)
 	col_rng = np.random.default_rng(col_random_seed)
 	
-	randCol = general_rng.choice(n, l, replace=False)
+	randCol = general_rng.choice(rc_local, l, replace=False)
 	signsRows = col_rng.choice([-1, 1], size=rc_local)
 	signsCols = col_rng.choice([-1, 1], size=l)
 	
