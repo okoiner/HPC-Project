@@ -8,6 +8,7 @@ file_path = "../testing_discarded/" + "F_svd_v3.csv"
 titles = ["PolyDecay, $R = 10$, $p = 1$, $\ell = 2k$, block SRHT", "ExpDecay, $R = 10$, $p = 0.25$, $\ell = 2k$, block SRHT", "MNIST, $\sigma = 100$, $\ell = 2k$, block SRHT", "YearPredictionMSD, $\sigma = 10^5$, $\ell = 2k$, block SRHT", "YearPredictionMSD, $\sigma = 10^6$, $\ell = 2k$, block SRHT"]
 plot_names = ["F_PolyDecay", "F_ExpDecay", "F_MNIST", "F_Year_a", "F_Year_b"]
 color_dict = ["red", "blue", "green", "magenta", "purple", "orange", "cyan", "pink", "gray", "brown", "black", "teal", "maroon", "olive", "navy", "lime", "coral", "beige", "turquoise", "indigo", "violet"]
+ylims = [(0, 1.05), (0, 1.7), (0, 1.05), (0, 1.05), (0, 1.05)]
 
 count = 3
 
@@ -35,10 +36,7 @@ for type_id, matrix_type in enumerate(matrix_types):
 			if counter >= count:
 				break
 	plt.xlim((0, max(rows['k'])+3))
-	if matrix_type == 1 or matrix_type == 1:
-		plt.ylim((0, 1.7))
-	else:
-		plt.ylim((0, 1.05))
+	plt.ylim(ylims[matrix_type])
 	plt.xlabel("Singular value index", fontsize=14)
 	plt.ylabel("Error ratio $\sigma_i(A)/\sigma_i(A_k)$", fontsize=14)
 	plt.xticks(fontsize=12)
