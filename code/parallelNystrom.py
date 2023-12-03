@@ -49,7 +49,7 @@ s = comm.Get_size()
 
 #In the following section we read from a csv file the settings for the test
 save_results = True
-save_svd = True
+save_svd = False
 (n,l,k,sketch_matrix,nz) = (None, None, None, None, None)
 if rank == 0:
 	print("")

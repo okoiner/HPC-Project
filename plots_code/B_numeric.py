@@ -2,9 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
-path_prefix = "../testing_backup/"
+path_prefix = "../testing/"
 file_names = ["B_matrix0_error_vs_k_vs_l.csv",
-	"B_matrix1_error_vs_k_vs_l.csv",
+	"B_matrix1_test.csv",
 	"B_matrix2_error_vs_k_vs_l.csv",
 	"B_matrix3a_error_vs_k_vs_l.csv",
 	"B_matrix3b_error_vs_k_vs_l.csv"]
