@@ -4,7 +4,7 @@ def A_PolyDecay(n, R, p):
 	return np.diag(np.array([1]*R + [x**(-p) for x in range(2,n-R+2)]))
 
 def A_ExpDecay(n, R, p):
-	return np.diag(np.array([1]*R + [10**(-x*p) for x in range(1,n-R+1)], dtype = 'd'))
+	return np.diag(np.array([1]*R + [(10**(-x*p) + 1) - 1 for x in range(1,n-R+1)], dtype = 'd'))
 
 def A_MNIST(n, sigma = 100):
 	try:
