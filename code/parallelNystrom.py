@@ -37,7 +37,7 @@ def block_SRHT(l, rc_local, general_random_seed, col_random_seed):
 	general_rng = np.random.default_rng(general_random_seed)
 	col_rng = np.random.default_rng(col_random_seed)
 	
-	randCol = general_rng.choice(n, l, replace=False)
+	randCol = general_rng.choice(rc_local, l, replace=False)
 	signsRows = col_rng.choice([-1, 1], size=rc_local)
 	signsCols = col_rng.choice([-1, 1], size=l)
 	
@@ -49,7 +49,7 @@ s = comm.Get_size()
 
 #In the following section we read from a csv file the settings for the test
 save_results = True
-save_svd = True
+save_svd = False
 (n,l,k,sketch_matrix,nz) = (None, None, None, None, None)
 if rank == 0:
 	print("")
@@ -219,7 +219,8 @@ if rank == 0:
 			realS = np.diag(A)
 		save_svd_to_csv(line_id, S_k**2, realS[:k])
 	
-	error_nuc = np.linalg.norm(A - A_nystrom, ord='nuc')/nuc_norm_A(matrix_type, n, RR, p, sigma)
+	# error_nuc = np.linalg.norm(A - A_nystrom, ord='nuc')/nuc_norm_A(matrix_type, n, RR, p, sigma)
+	error_nuc = np.linalg.norm(A - A_nystrom, ord='nuc')/np.linalg.norm(A, ord='nuc')
 	if save_results:
 		save_results_to_csv(line_id, s, cholesky_success, general_random_seed, error_nuc, wt)
 		add_counter(1)
