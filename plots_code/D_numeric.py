@@ -3,12 +3,13 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.backends.backend_pdf import PdfPages
 
-path_prefix = "../testing_backup/"
-file_names = ["D_matrix1_error_vs_nz_vs_lk.csv",
+path_prefix = "../testing/"
+file_names = ["D_matrix0_error_vs_nz_vs_lk.csv", "D_matrix1_error_vs_nz_vs_lk.csv",
 	"D_matrix2_error_vs_nz_vs_lk.csv",
-	"D_matrix3a_error_vs_nz_vs_lk.csv"]
-titles = ["ExpDecay, $R = 10$, $p = 0.25$, $\ell = 2k$, short-axis", "MNIST, $\sigma = 100$, $\ell = 2k$, short-axis", "YearPredictionMSD, $\sigma = 10^5$, $\ell = 2k$, short-axis"]
-plot_names = ["D_ExpDecay", "D_MNIST", "D_Year_a"]
+	"D_matrix3a_error_vs_nz_vs_lk.csv",
+	"D_matrix3b_error_vs_nz_vs_lk.csv"]
+titles = ["PolyDecay, $R = 10$, $p = 0.25$, $\ell = 2k$, short-axis", "ExpDecay, $R = 10$, $p = 0.25$, $\ell = 2k$, short-axis", "MNIST, $\sigma = 100$, $\ell = 2k$, short-axis", "YearPredictionMSD, $\sigma = 10^5$, $\ell = 2k$, short-axis", "YearPredictionMSD, $\sigma = 10^6$, $\ell = 2k$, short-axis"]
+plot_names = ["D_PolyDecay", "D_ExpDecay", "D_MNIST", "D_Year_a", "D_Year_b"]
 sketch_dict = ["SRHT", "short-axis", "gaussian", "block SRHT"]
 color_dict = ["red", "blue", "green", "magenta", "purple", "orange", "cyan", "pink", "gray", "brown", "black", "teal", "maroon", "olive", "navy", "lime", "coral", "beige", "turquoise", "indigo", "violet"]
 line_style_dict = ["-x", "--+", ":*"]

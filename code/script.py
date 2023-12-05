@@ -1,3 +1,9 @@
 from sketching import *
+import numpy as np
+import random
 
-print(short_axis_sketch(5, 10, 3))
+mylist = list(range(1,401))
+random.shuffle(mylist)
+
+for i in mylist:
+	print(i)

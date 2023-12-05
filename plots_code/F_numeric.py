@@ -3,12 +3,12 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.backends.backend_pdf import PdfPages
 
-file_path = "../testing_discarded/" + "F_svd_v3.csv"
+file_path = "../testing/" + "F_svd.csv"
 
 titles = ["PolyDecay, $R = 10$, $p = 1$, $\ell = 2k$, block SRHT", "ExpDecay, $R = 10$, $p = 0.25$, $\ell = 2k$, block SRHT", "MNIST, $\sigma = 100$, $\ell = 2k$, block SRHT", "YearPredictionMSD, $\sigma = 10^5$, $\ell = 2k$, block SRHT", "YearPredictionMSD, $\sigma = 10^6$, $\ell = 2k$, block SRHT"]
 plot_names = ["F_PolyDecay", "F_ExpDecay", "F_MNIST", "F_Year_a", "F_Year_b"]
 color_dict = ["red", "blue", "green", "magenta", "purple", "orange", "cyan", "pink", "gray", "brown", "black", "teal", "maroon", "olive", "navy", "lime", "coral", "beige", "turquoise", "indigo", "violet"]
-ylims = [(0, 1.05), (0, 1.7), (0, 1.05), (0, 1.05), (0, 1.05)]
+ylims = [(0.25, 1.0375), (0, 1.7), (0.25, 1.0375), (0.8, 1.01), (0.8, 1.01)]
 
 count = 3
 
@@ -38,7 +38,7 @@ for type_id, matrix_type in enumerate(matrix_types):
 	plt.xlim((0, max(rows['k'])+3))
 	plt.ylim(ylims[matrix_type])
 	plt.xlabel("Singular value index", fontsize=14)
-	plt.ylabel("Error ratio $\sigma_i(A)/\sigma_i(A_k)$", fontsize=14)
+	plt.ylabel("Error ratio $\sigma_i(A_k)/\sigma_i(A)$", fontsize=14)
 	plt.xticks(fontsize=12)
 	plt.yticks(fontsize=12)
 	plt.title(titles[type_id], fontsize=15)
