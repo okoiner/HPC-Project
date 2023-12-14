@@ -36,15 +36,15 @@ The following parameters have to be set inside `testing/test_default.csv`, in or
 
 ## Run an array of tests saving the results
 1. Create a csv file like `testing/test_default.csv` with one line of settings per test.
-2. Set `save_results` to `True` in `code/seqNystrom.py` or `code/parallelNystrom.py`.
-3. Run `code/setup_test.py` from `/code` and enter the name of the csv file and from which line to start (`1` is the smallest possible).
-4. Run `code/seqNystrom.py` or `code/parallelNystrom.py` from `/code` multiple times until the csv file is filled (this can be done for example using a shell script).
+2. Set `save_results = True` in `seqNystrom.py` or `parallelNystrom.py`.
+3. Run `setup_test.py` from `/code` and enter the name of the csv file and from which line to start (`1` is the smallest possible).
+4. Run `seqNystrom.py` or `parallelNystrom.py` from `/code` multiple times until the csv file is filled (this can be done for example using a shell script).
    
-To rerun the same tests remove the generated data from the csv file and restart from running `code/setup_test.py`.
+To rerun the same tests remove the generated data from the csv file and restart from running `setup_test.py`.
 
 ## Data folder
 * `data/dataMNIST.npy` contains a reduced version of the MNIST dataset (16384 lines).
 * `data/dataYearPredictionMSD.npy` contains a reduced version of the YearPredictionMSD dataset (16384 lines).
-* `data/generated_matrices` stores the testing matrices once they have been generated for the first time, so they don't need to be generated from scrach in every subsequent test.
-* `data/nuclears_norms` stores the nuclear norms of the testing matrices once they have been generated for the first time (again, for performance reasons).
+* `data/generated_matrices/` stores the testing matrices once they have been generated for the first time, so they don't need to be generated from scrach in every subsequent test.
+* `data/nuclears_norms/` stores the nuclear norms of the testing matrices once they have been generated for the first time (again, for performance reasons).
 
